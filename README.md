@@ -1,6 +1,9 @@
 # Project Live Working
 https://content-pipeline-sarthak-sarkar.streamlit.app/
 
+# How to use this
+"How to use the app" note: type a topic, press Enter, wait 3 to 5 minutes, download the PDF
+
 # Multi-Agent Content Creation Pipeline
 
 **Course:** CE509 Agentic AI | **PS No.:** 18 | **Domain:** Content, Media & Creativity
