@@ -9,7 +9,7 @@ st.write("Enter a topic. Six AI agents will research it, write and fact-check a 
 topic = st.text_input("Topic", placeholder="Enter any topic, e.g. Renewable energy")
 
 if st.button("Generate content") and topic.strip():
-    with st.spinner("Agents are working... this takes 1-2 minutes"):
+    with st.spinner("Agents are working... this takes 3-5 minutes"):
         try:
             final = run_pipeline(topic.strip())
             st.success("Done!")
