@@ -6,8 +6,32 @@ from agents.fact_checker import check_facts
 from agents.seo import optimize_seo
 from agents.visual import describe_visuals
 from agents.editor import final_polish
+from tools.image_gen import image_url
 
 MAX_REVISIONS = 2
+
+
+def insert_images(markdown: str, visuals: list) -> str:
+    """Put the hero image after the main title and one image after each H2 heading."""
+    if not visuals:
+        return markdown
+
+    def block(v):
+        alt = v["alt"].replace("[", "").replace("]", "")
+        return f"\n![{alt}]({image_url(v['prompt'])})\n*{alt}*\n"
+
+    out, hero_done, idx = [], False, 1
+    for line in markdown.split("\n"):
+        out.append(line)
+        if not hero_done and line.startswith("# "):
+            out.append(block(visuals[0]))
+            hero_done = True
+        elif line.startswith("## ") and idx < len(visuals):
+            out.append(block(visuals[idx]))
+            idx += 1
+    if not hero_done:
+        out.insert(0, block(visuals[0]))
+    return "\n".join(out)
 
 
 def run_pipeline(topic: str) -> str:
@@ -29,11 +53,12 @@ def run_pipeline(topic: str) -> str:
     print("[4/6] Optimizing for SEO...")
     seo = optimize_seo(topic, draft)
 
-    print("[5/6] Generating visual descriptions...")
+    print("[5/6] Generating visuals...")
     visuals = describe_visuals(seo["article"])
 
     print("[6/6] Final editing...")
-    final = final_polish(seo["meta"], seo["article"], visuals)
+    final = final_polish(seo["meta"], seo["article"])
+    final = insert_images(final, visuals)
 
     os.makedirs("outputs", exist_ok=True)
     slug = re.sub(r"[^a-z0-9]+", "-", topic.lower()).strip("-")
