@@ -6,7 +6,7 @@ from agents.fact_checker import check_facts
 from agents.seo import optimize_seo
 from agents.visual import describe_visuals
 from agents.editor import final_polish
-from tools.image_gen import image_url
+from tools.image_gen import image_url, warm_up
 
 MAX_REVISIONS = 2
 
@@ -55,6 +55,14 @@ def run_pipeline(topic: str) -> str:
 
     print("[5/6] Generating visuals...")
     visuals = describe_visuals(seo["article"])
+    ready = []
+    for i, v in enumerate(visuals, 1):
+        print(f"      Rendering image {i}/{len(visuals)}...")
+        if warm_up(image_url(v["prompt"])):
+            ready.append(v)
+        else:
+            print("      Image failed, skipping it.")
+    visuals = ready
 
     print("[6/6] Final editing...")
     final = final_polish(seo["meta"], seo["article"])
